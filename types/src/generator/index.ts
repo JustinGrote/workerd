@@ -12,6 +12,8 @@ import {
 import ts from "typescript";
 import { createStructureNode } from "./structure";
 
+export { getTypeName } from "./type";
+
 type StructureMap = Map<string, Structure>;
 // Builds a lookup table mapping type names to structures
 function collectStructureMap(root: StructureGroups): StructureMap {
@@ -153,16 +155,6 @@ export function generateDefinitions(root: StructureGroups): ts.Node[] {
         structureNodes.push(createStructureNode(structure, asClass));
       }
     });
-
-    // Add group label to first in group
-    if (structureNodes.length > 0) {
-      ts.addSyntheticLeadingComment(
-        structureNodes[0],
-        ts.SyntaxKind.SingleLineCommentTrivia,
-        ` ${group.getName()}`,
-        /* hasTrailingNewLine */ true
-      );
-    }
 
     return structureNodes;
   });
