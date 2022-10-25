@@ -38,6 +38,11 @@ public:
     jsg::Optional<double> suffix;
 
     JSG_STRUCT(offset, length, suffix);
+    JSG_STRUCT_TS_OVERRIDE(type R2Range =
+      | { offset: number; length?: number }
+      | { offset?: number; length: number }
+      | { suffix: number }
+    );
   };
 
   struct Conditional {
@@ -48,6 +53,7 @@ public:
     jsg::Optional<bool> secondsGranularity;
 
     JSG_STRUCT(etagMatches, etagDoesNotMatch, uploadedBefore, uploadedAfter, secondsGranularity);
+    JSG_STRUCT_TS_OVERRIDE(R2Conditional);
   };
 
   struct GetOptions {
@@ -55,6 +61,7 @@ public:
     jsg::Optional<kj::OneOf<Range, jsg::Ref<Headers>>> range;
 
     JSG_STRUCT(onlyIf, range);
+    JSG_STRUCT_TS_OVERRIDE(R2GetOptions);
   };
 
   struct Checksums {
@@ -65,6 +72,7 @@ public:
     jsg::Optional<kj::Array<kj::byte>> sha512;
 
     JSG_STRUCT(md5, sha1, sha256, sha384, sha512);
+    JSG_STRUCT_TS_OVERRIDE(R2Checksums);
 
     Checksums clone() const;
   };
@@ -96,6 +104,7 @@ public:
     jsg::Optional<kj::OneOf<kj::Array<kj::byte>, jsg::NonCoercible<kj::String>>> sha512;
 
     JSG_STRUCT(onlyIf, httpMetadata, customMetadata, md5, sha1, sha256, sha384, sha512);
+    JSG_STRUCT_TS_OVERRIDE(R2PutOptions);
   };
 
   class HeadResult: public jsg::Object {
@@ -148,6 +157,7 @@ public:
       JSG_LAZY_READONLY_INSTANCE_PROPERTY(customMetadata, getCustomMetadata);
       JSG_LAZY_READONLY_INSTANCE_PROPERTY(range, getRange);
       JSG_METHOD(writeHttpMetadata);
+      JSG_TS_OVERRIDE(R2Object);
     }
 
   protected:
@@ -196,6 +206,9 @@ public:
       JSG_METHOD(text);
       JSG_METHOD(json);
       JSG_METHOD(blob);
+      JSG_TS_OVERRIDE(R2ObjectBody {
+        json<T>(): Promise<T>;
+      });
     }
   private:
     jsg::Ref<ReadableStream> body;
@@ -208,6 +221,7 @@ public:
     kj::Array<kj::String> delimitedPrefixes;
 
     JSG_STRUCT(objects, truncated, cursor, delimitedPrefixes);
+    JSG_STRUCT_TS_OVERRIDE(R2Objects);
   };
 
   struct ListOptions {
@@ -219,6 +233,9 @@ public:
     jsg::Optional<kj::Array<jsg::NonCoercible<kj::String>>> include;
 
     JSG_STRUCT(limit, prefix, cursor, delimiter, startAfter, include);
+    JSG_STRUCT_TS_OVERRIDE(R2ListOptions {
+      include?: ("httpMetadata" | "customMetadata")[];
+    });
   };
 
   jsg::Promise<kj::Maybe<jsg::Ref<HeadResult>>> head(jsg::Lock& js, kj::String key,
@@ -241,6 +258,13 @@ public:
     JSG_METHOD(put);
     JSG_METHOD_NAMED(delete, delete_);
     JSG_METHOD(list);
+
+    JSG_TS_OVERRIDE({
+      get(key: string, options: R2GetOptions & { onlyIf: R2BucketConditional | Headers }): Promise<R2ObjectBody | R2Object | null>;
+      get(key: string, options?: R2GetOptions): Promise<R2ObjectBody | null>;
+
+      put(key: string, value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob, options?: R2PutOptions): Promise<R2Object>;
+    });
   }
 
   struct UnwrappedConditional {

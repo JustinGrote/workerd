@@ -123,6 +123,15 @@ public:
     JSG_METHOD(values);
 
     JSG_ITERABLE(entries);
+
+    JSG_TS_OVERRIDE({
+      constructor(init?: Headers | Record<string, string> | [key: string, value: string][]);
+
+      entries(): IterableIterator<[key: string, value: string]>;
+      [Symbol.iterator](): IterableIterator<[key: string, value: string]>;
+
+      forEach<This = unknown>(callback: (this: This, value: string, key: string, parent: Headers) => void, thisArg?: This): void;
+    });
   }
 
 private:
@@ -302,6 +311,9 @@ public:
     JSG_METHOD(json);
     JSG_METHOD(formData);
     JSG_METHOD(blob);
+
+    JSG_TS_OVERRIDE({ json<T>(): Promise<T>; });
+    // Allow JSON body type to be specified
   }
 
 protected:
@@ -417,6 +429,13 @@ public:
     JSG_METHOD(get);
     JSG_METHOD(put);
     JSG_METHOD_NAMED(delete, delete_);
+
+    JSG_TS_OVERRIDE({
+      get: never;
+      put: never;
+      delete: never;
+    });
+    // Omit method helpers from definition
   }
 
 private:
@@ -494,6 +513,7 @@ struct RequestInitializerDict {
 
   JSG_STRUCT(method, headers, body, redirect, fetcher, cf, mode, credentials, cache,
               referrer, referrerPolicy, integrity, signal, observe);
+  JSG_STRUCT_TS_OVERRIDE(RequestInit);
 };
 
 class Request: public Body {
@@ -682,6 +702,7 @@ public:
     jsg::Optional<kj::String> encodeBody;
 
     JSG_STRUCT(status, statusText, headers, cf, webSocket, encodeBody);
+    JSG_STRUCT_TS_OVERRIDE(ResponseInit);
   };
 
   using Initializer = kj::OneOf<InitializerDict, jsg::Ref<Response>>;

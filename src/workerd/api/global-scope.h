@@ -86,6 +86,14 @@ public:
     JSG_NESTED_TYPE(EventTarget);
 
     JSG_METHOD(importScripts);
+
+    JSG_TS_DEFINE(type WorkerGlobalScopeEventMap = {
+      fetch: FetchEvent;
+      scheduled: ScheduledEvent;
+      unhandledrejection: PromiseRejectionEvent;
+      rejectionhandled: PromiseRejectionEvent;
+    });
+    JSG_TS_OVERRIDE(extends EventTarget<WorkerGlobalScopeEventMap>);
   }
 
   static jsg::Ref<WorkerGlobalScope> constructor() = delete;
@@ -132,6 +140,23 @@ struct ExportedHandler {
   // Self-ref potentially allows extracting other custom handlers from the object.
 
   JSG_STRUCT(fetch, trace, scheduled, alarm, self);
+
+  JSG_STRUCT_TS_ROOT();
+  // ExportedHandler isn't included in the global scope, but we still want to
+  // include it in type definitions.
+
+  JSG_STRUCT_TS_DEFINE(
+    type ExportedHandlerFetchHandler<Env = unknown> = (request: Request, env: Env, ctx: ExecutionContext) => Response | Promise<Response>;
+    type ExportedHandlerTraceHandler<Env = unknown> = (traces: TraceItem[], env: Env, ctx: ExecutionContext) => void | Promise<void>;
+    type ExportedHandlerScheduledHandler<Env = unknown> = (controller: ScheduledController, env: Env, ctx: ExecutionContext) => void | Promise<void>;
+  );
+  JSG_STRUCT_TS_OVERRIDE(<Env = unknown> {
+    fetch?: ExportedHandlerFetchHandler<Env>;
+    trace?: ExportedHandlerTraceHandler<Env>;
+    scheduled?: ExportedHandlerScheduledHandler<Env>;
+    alarm: never;
+  });
+  // Make `env` parameter generic
 
   jsg::Value env = nullptr;
   jsg::Optional<jsg::Ref<ExecutionContext>> ctx = nullptr;
@@ -385,6 +410,42 @@ public:
     JSG_NESTED_TYPE(FixedLengthStream);
     JSG_NESTED_TYPE(IdentityTransformStream);
     JSG_NESTED_TYPE(HTMLRewriter);
+
+    JSG_TS_ROOT();
+    JSG_TS_DEFINE(
+      interface Console {
+        "assert"(condition?: boolean, ...data: any[]): void;
+        clear(): void;
+        count(label?: string): void;
+        countReset(label?: string): void;
+        debug(...data: any[]): void;
+        dir(item?: any, options?: any): void;
+        dirxml(...data: any[]): void;
+        error(...data: any[]): void;
+        group(...data: any[]): void;
+        groupCollapsed(...data: any[]): void;
+        groupEnd(): void;
+        info(...data: any[]): void;
+        log(...data: any[]): void;
+        table(tabularData?: any, properties?: string[]): void;
+        time(label?: string): void;
+        timeEnd(label?: string): void;
+        timeLog(label?: string, ...data: any[]): void;
+        timeStamp(label?: string): void;
+        trace(...data: any[]): void;
+        warn(...data: any[]): void;
+      }
+      const console: Console;
+    );
+    JSG_TS_OVERRIDE({
+      btoa(data: string): string;
+
+      setTimeout(callback: (...args: any[]) => void, msDelay?: number): number;
+      setTimeout<Args extends any[]>(callback: (...args: Args) => void, msDelay?: number, ...args: Args): number;
+
+      setInterval(callback: (...args: any[]) => void, msDelay?: number): number;
+      setInterval<Args extends any[]>(callback: (...args: Args) => void, msDelay?: number, ...args: Args): number;
+    });
   }
 
   TimeoutId::Generator timeoutIdGenerator;

@@ -21,7 +21,11 @@ public:
 
   struct Initializer {
     v8::Local<v8::Value> data;
+
     JSG_STRUCT(data);
+    JSG_STRUCT_TS_OVERRIDE(MessageEventInit {
+      data: ArrayBuffer | string;
+    });
   };
   static jsg::Ref<MessageEvent> constructor(
       kj::String type, Initializer initializer, v8::Isolate* isolate) {
@@ -44,6 +48,10 @@ public:
     JSG_READONLY_INSTANCE_PROPERTY(lastEventId, getLastEventId);
     JSG_READONLY_INSTANCE_PROPERTY(source, getSource);
     JSG_READONLY_INSTANCE_PROPERTY(ports, getPorts);
+
+    JSG_TS_OVERRIDE({
+      readonly data: ArrayBuffer | string;
+    });
   }
 
 private:
@@ -61,7 +69,9 @@ public:
     jsg::Optional<int> code;
     jsg::Optional<kj::String> reason;
     jsg::Optional<bool> wasClean;
+
     JSG_STRUCT(code, reason, wasClean);
+    JSG_STRUCT_TS_OVERRIDE(CloseEventInit);
   };
   static jsg::Ref<CloseEvent> constructor(kj::String type, Initializer initializer) {
     return jsg::alloc<CloseEvent>(kj::mv(type),
@@ -225,6 +235,14 @@ public:
       JSG_READONLY_INSTANCE_PROPERTY(protocol, getProtocol);
       JSG_READONLY_INSTANCE_PROPERTY(extensions, getExtensions);
     }
+
+    JSG_TS_DEFINE(type WebSocketEventMap = {
+      close: CloseEvent;
+      message: MessageEvent;
+      open: Event;
+      error: ErrorEvent;
+    });
+    JSG_TS_OVERRIDE(extends EventTarget<WebSocketEventMap>);
   }
 
 private:
@@ -354,6 +372,11 @@ public:
     // than named instance properties but jsg does not yet have support for that.
     JSG_READONLY_INSTANCE_PROPERTY(0, getFirst);
     JSG_READONLY_INSTANCE_PROPERTY(1, getSecond);
+
+    JSG_TS_OVERRIDE(const WebSocketPair: {
+      new (): { 0: WebSocket; 1: WebSocket };
+    });
+    // TODO(now): document why we need this
   }
 
 private:
