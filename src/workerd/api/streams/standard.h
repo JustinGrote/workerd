@@ -760,6 +760,8 @@ private:
          : readRequest(kj::mv(readRequest)),
            controller(kj::mv(controller)),
            view(js.v8Ref(this->readRequest->getView(js))) {}
+
+    void updateView(jsg::Lock& js);
   };
 
   kj::Maybe<Impl> maybeImpl;
