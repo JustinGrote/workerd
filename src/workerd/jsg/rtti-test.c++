@@ -174,7 +174,7 @@ KJ_TEST("resource structure") {
   KJ_EXPECT(tStructure<Base>() == "(name = \"Base\", members = [], "
       "extends = (intrinsic = (name = \"v8::kIteratorPrototype\")), "
       "iterable = false, asyncIterable = false, "
-      "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::Base\")");
+      "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::Base\", tsRoot = false)");
 
   KJ_EXPECT(tStructure<TestResource>() == "(name = \"TestResource\", members = ["
       "(method = (name = \"instanceMethod\", returnType = (voidt = void), args = [(number = (name = \"int\")), (number = (name = \"double\"))], static = false)), "
@@ -188,7 +188,7 @@ KJ_TEST("resource structure") {
       "(constructor = (args = [(maybe = (value = (string = (name = \"kj::String\")), name = \"jsg::Optional\"))]))], "
       "extends = (structure = (name = \"Base\", fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::Base\")), "
       "iterable = false, asyncIterable = false, "
-      "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestResource\")");
+      "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestResource\", tsRoot = false)");
 }
 
 struct TestNested : jsg::Object {
@@ -202,12 +202,13 @@ KJ_TEST("nested structure") {
     "name = \"Base\", members = [], "
     "extends = (intrinsic = (name = \"v8::kIteratorPrototype\")), "
     "iterable = false, asyncIterable = false, "
-    "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::Base\""
+    "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::Base\", "
+    "tsRoot = false"
     "), "
     "name = \"Base\"))"
     "], "
     "iterable = false, asyncIterable = false, "
-    "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestNested\")");
+    "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestNested\", tsRoot = false)");
 }
 
 struct TestConstant : jsg::Object {
@@ -228,7 +229,8 @@ KJ_TEST("constant members") {
     "(constant = (name = \"ENABLED\", value = 1)), "
     "(constant = (name = \"CIRCLE\", value = 2))], "
     "iterable = false, asyncIterable = false, "
-    "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestConstant\")");
+    "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestConstant\", "
+    "tsRoot = false)");
 }
 
 struct TestStruct {
@@ -246,7 +248,8 @@ KJ_TEST("struct structure") {
       "(property = (name = \"a\", type = (number = (name = \"int\")), readonly = false, lazy = false, prototype = false)), "
       "(property = (name = \"b\", type = (boolt = void), readonly = false, lazy = false, prototype = false))], "
       "iterable = false, asyncIterable = false, "
-      "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestStruct\")");
+      "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestStruct\", "
+      "tsRoot = false)");
 }
 
 struct TestSymbolTable: public jsg::Object {
@@ -268,7 +271,8 @@ KJ_TEST("symbol table") {
       "(method = (name = \"acceptResource\", returnType = (voidt = void), args = [(structure = (name = \"TestResource\", fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestResource\"))], static = false)), "
       "(method = (name = \"recursiveTypeFunction\", returnType = (voidt = void), args = [(structure = (name = \"TestSymbolTable\", fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestSymbolTable\"))], static = false))], "
       "iterable = false, asyncIterable = false, "
-      "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestSymbolTable\")");
+      "fullyQualifiedName = \"workerd::jsg::rtti::(anonymous namespace)::TestSymbolTable\", "
+      "tsRoot = false)");
 
   KJ_EXPECT(builder.structure("workerd::jsg::rtti::(anonymous namespace)::TestSymbolTable"_kj) != nullptr);
   KJ_EXPECT(builder.structure("workerd::jsg::rtti::(anonymous namespace)::TestResource"_kj) != nullptr);

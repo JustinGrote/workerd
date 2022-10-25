@@ -198,6 +198,15 @@ struct Structure {
   # true if the structure is async iterable
   asyncIterator @7 :Method;
   # Method returning async iterator if the structure is async iterable
+
+  tsRoot @8 :Bool;
+  # TODO(now): document
+
+  tsOverride @9 :Text;
+  # TODO(now): document
+
+  tsDefine @10 :Text;
+  # TODO(now): document
 }
 
 struct Member {
